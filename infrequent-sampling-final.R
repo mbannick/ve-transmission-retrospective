@@ -2,6 +2,7 @@ rm(list=ls())
 
 library(magrittr)
 library(data.table)
+library(colorspace)
 library(ggplot2)
 
 # Get analytic vaccine efficacy -- truth
@@ -84,20 +85,50 @@ ggplot(data=data,
 dev.off()
 
 # Which k's (testing interval) to plot
-k.breaks <- c(1, 3, 5, 7, 9, 11, 14)
+k.breaks <- c(1, 3, 5, 7, 9, 11)
 
-# FIGURE 2(B) IN THE MAIN TEXT
-pdf("bias-plot-duration.pdf", height=6, width=6)
-p1 <- ggplot(data=data[k %in% k.breaks],
-             aes(x=ve, y=inferred, color=k, group=k)) +
-  geom_line() +
-  labs(color="Testing Interval (days)", y="VE Inferred", x="VE") +
-  theme(legend.position="bottom") +
-  ggtitle("(b) Infrequent Sampling") +
-  geom_abline(intercept=0, slope=1, linetype='dashed') +
-  scale_color_gradient(
-    breaks = k.breaks,
-    labels = k.breaks,
-  )
-p1
+# FIGURE 1(A) IN THE MAIN TEXT
+pdf("figure-1-B.pdf", height=6, width=8, useDingbats=FALSE)
+
+data <- data.table(data)
+cols <- sequential_hcl(n=length(k.breaks), palette="viridis")
+par(oma=c(0, 5, 0, 0),
+    xpd=FALSE)
+for(i in 1:length(k.breaks)){
+  dat.k <- data[k == k.breaks[i]]
+  if(i == 1){
+    plot(dat.k$inferred ~ dat.k$ve, type='l', col=cols[i], lwd=2,
+         ylim=c(0.3, 1.0),
+         ylab="Vaccine Efficacy Inferred",
+         xlab="Vaccine Efficacy",
+         las=1, axes=F, cex.lab=1.3)
+    box(bty="l")
+    axis(1, cex.axis=1.3, las=1)
+    axis(2, cex.axis=1.3, las=1)
+    par(xpd=FALSE)
+    abline(a=0, b=1, lty=2)
+    mtext(text="B)",side=3,line=-2,outer=TRUE,adj=-0.1, cex=1.3)
+  } else {
+    lines(dat.k$inferred ~ dat.k$ve, col=cols[i], lwd=2)
+  }
+}
+legend("topleft", inset=0.08, col=cols, lwd=2, ncol=2, legend=c(
+  "1", paste0(k.breaks[2:length(k.breaks)])),
+  border=1, title=expression(underline("Testing Interval, days")), cex=1.3)
+
+# p1 <- ggplot(data=data[k %in% k.breaks],
+#              aes(x=ve, y=inferred, color=k, group=k)) +
+#   geom_line() +
+#   labs(color="Testing Interval (days)", y="VE Inferred", x="VE") +
+#   theme_bw() +
+#   theme(legend.position="bottom") +
+#   ggtitle("(b) Infrequent Sampling") +
+#   geom_abline(intercept=0, slope=1, linetype='dashed') +
+#   scale_color_gradient(
+#     breaks = k.breaks,
+#     labels = k.breaks,
+#   )
+# p1
 dev.off()
+
+data.inf <- data
