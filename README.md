@@ -1,2 +1,1 @@
-# ve-transmission-retrospective
-Code to accompany paper on retrospective observational studies of vaccine efficacy against SAR of SARS-CoV-2
+Code for paper: Retrospective, Observational Studies for Estimating Vaccine Effects on the Secondary Attack Rate of SARS-CoV-2
